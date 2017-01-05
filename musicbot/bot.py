@@ -1267,7 +1267,7 @@ class MusicBot(discord.Client):
         matchUrl = pattern.match(song_url)
         if matchUrl is None:
             song_url = song_url.replace('/', '%2F')
-            
+
         try:
             info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
         except Exception as e:
@@ -1711,10 +1711,28 @@ class MusicBot(discord.Client):
             prog_str = ('`[{progress}]`' if streaming else '`[{progress}/{total}]`').format(
                 progress=song_progress, total=song_total
             )
+            prog_bar_str = ''
+
+            # percentage shows how much of the current song has already been played
+            percentage = 0.0
+            if player.current_entry.duration > 0:
+                percentage = player.progress / player.current_entry.duration
+            """
+            This for loop adds  empty or full squares to prog_bar_str (it could look like
+            ■■■■■■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□
+            if for example the song has already played 25% of the songs duration
+            """
+            progress_bar_length = 30
+            for i in range(progress_bar_length):
+                if (percentage < 1 / progress_bar_length * i):
+                    prog_bar_str += '□'
+                else:
+                    prog_bar_str += '■'
+
             action_text = 'Streaming' if streaming else 'Playing'
 
             if player.current_entry.meta.get('channel', False) and player.current_entry.meta.get('author', False):
-                np_text = "Now {action}: **{title}** added by **{author}** {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>".format(
+                np_text = "Now {action}: **{title}** added by **{author}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>".format(
                     action=action_text,
                     title=player.current_entry.title,
                     author=player.current_entry.meta['author'].name,
@@ -1722,7 +1740,7 @@ class MusicBot(discord.Client):
                     url=player.current_entry.url
                 )
             else:
-                np_text = "Now {action}: **{title}** {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>".format(
+                np_text = "Now {action}: **{title}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>".format(
                     action=action_text,
                     title=player.current_entry.title,
                     progress=prog_str,
