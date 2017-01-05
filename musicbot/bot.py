@@ -1151,7 +1151,7 @@ class MusicBot(discord.Client):
                     commands.append("{}{}".format(self.config.command_prefix, command_name))
 
             helpmsg += ", ".join(commands)
-            helpmsg += "```\nHosted @ <SlidenShine.net>"
+            helpmsg += "```\nHosted @ SlidenShine.net\n"
             helpmsg += "You can also use `{}help x` for more info about each command.".format(self.config.command_prefix)
 
             return Response(helpmsg, reply=True, delete_after=60)
